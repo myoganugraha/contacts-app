@@ -83,7 +83,6 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
         {
           text: 'OK',
           onPress: () => {
-            console.log(contactInformation.id)
             dispatch(RemoveContact.action(contactInformation.id))
               .then(unwrapResult)
               .then(originalPromiseResult => {
@@ -95,7 +94,6 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
                 changeIsEditable(false);
               })
               .catch(rejectedValueOrSerializedError => {
-                console.log({ rejectedValueOrSerializedError })
                 Toast.show({
                   text1: 'Something went wrong',
                   text2: rejectedValueOrSerializedError.data.message,
