@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {IndexContactListContainer, IndexAddContactContainer} from '@/Containers';
+import {IndexContactListContainer, IndexAddContactContainer, IndexContactDetailsContainer} from '@/Containers';
 import {useSelector} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
 import {navigationRef, goBack} from '@/Navigators/Root';
@@ -18,6 +18,10 @@ const ApplicationNavigator = () => {
         <Stack.Screen
           name="Add Contact"
           component={IndexAddContactContainer}
+        />
+        <Stack.Screen
+          name="Contact Details"
+          component={IndexContactDetailsContainer}
         />
       </Stack.Navigator>
     </NavigationContainer>

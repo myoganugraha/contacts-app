@@ -62,7 +62,9 @@ const IndexContactListContainer = ({navigation}) => {
         {contactList && !contactListIsLoading && contactList.data && contactList.data.length > 0 ? (
           contactList.data.map((data, i) => {
             return (
-              <TouchableOpacity onPress={() => {}} key={i}>
+              <TouchableOpacity onPress={() => {
+                navigate('Contact Details', {contactInformation: data})
+              }} key={i}>
                 <View
                   style={{
                     backgroundColor: 'white',
