@@ -15,8 +15,8 @@ import {
 import FetchAllContacts from '@/Store/Contact/FetchAllContacts';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import { navigate } from '@/Navigators/Root'
-import { getInitial, isValidURL } from '@/Function'
+import {navigate} from '@/Navigators/Root';
+import {getInitial, isValidURL} from '@/Function';
 
 const IndexContactListContainer = ({navigation}) => {
   const dispatch = useDispatch();
@@ -40,12 +40,17 @@ const IndexContactListContainer = ({navigation}) => {
             }}
           />
         }>
-        {contactList && !contactListIsLoading && contactList.data && contactList.data.length > 0 ? (
+        {contactList &&
+        !contactListIsLoading &&
+        contactList.data &&
+        contactList.data.length > 0 ? (
           contactList.data.map((data, i) => {
             return (
-              <TouchableOpacity onPress={() => {
-                navigate('Contact Details', {contactInformation: data})
-              }} key={i}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigate('Contact Details', {contactInformation: data});
+                }}
+                key={i}>
                 <View
                   style={{
                     backgroundColor: 'white',
@@ -80,16 +85,17 @@ const IndexContactListContainer = ({navigation}) => {
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}>
-                      <Text>
+                      <Text style={{color: 'black'}}>
                         {getInitial(data.firstName + ' ' + data.lastName)}
                       </Text>
                     </View>
                   )}
                   <View>
-                    <Text style={{fontWeight: '600', fontSize: 18}}>
+                    <Text
+                      style={{fontWeight: '600', fontSize: 18, color: 'black'}}>
                       {data.firstName + ' ' + data.lastName}
                     </Text>
-                    <Text style={{}}>{'Age : ' + data.age}</Text>
+                    <Text style={{color: 'black'}}>{'Age : ' + data.age}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -106,7 +112,9 @@ const IndexContactListContainer = ({navigation}) => {
           bottom: 20,
           right: 20,
         }}
-        onPress={() => {navigate('Add Contact')}}>
+        onPress={() => {
+          navigate('Add Contact');
+        }}>
         <View
           style={{
             width: 60,
@@ -114,9 +122,10 @@ const IndexContactListContainer = ({navigation}) => {
             borderRadius: 30,
             backgroundColor: '#ee6e73',
             alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        ><Icon size={40} color="white" name="add" /></View>
+            justifyContent: 'center',
+          }}>
+          <Icon size={40} color="white" name="add" />
+        </View>
       </TouchableOpacity>
     </View>
   );

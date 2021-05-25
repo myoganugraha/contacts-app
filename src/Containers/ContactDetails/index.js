@@ -16,6 +16,7 @@ import {
 
 import FetchContactDetails from '@/Store/Contact/FetchContactDetails';
 import ResetContactDetails from '@/Store/Contact/ResetContactDetails';
+import RemoveContact from '@/Store/Contact/RemoveContact';
 import UpdateContactData from '@/Store/Contact/UpdateContactData';
 import {getInitial, isValidURL} from '@/Function';
 import {unwrapResult} from '@reduxjs/toolkit';
@@ -23,6 +24,7 @@ import {unwrapResult} from '@reduxjs/toolkit';
 import {navigateAndSimpleReset} from '@/Navigators/Root';
 
 import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const IndexContactDetailsContainer = ({route, navigation}) => {
   const {contactInformation} = route.params;
@@ -40,6 +42,9 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
   const updateContactDataIsLoading = useSelector(
     state => state.contact.updateContactData.loading,
   );
+  const removeContactIsLoading = useSelector(
+    state => state.contact.removeContact.loading,
+  );
 
   useEffect(() => {
     dispatch(ResetContactDetails.action());
@@ -51,11 +56,10 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
     }
   }, [contactDetails]);
 
-  getLatestData = () => {
+  const getLatestData = () => {
     dispatch(FetchContactDetails.action(contactInformation.id))
       .then(unwrapResult)
       .then(originalPromiseResult => {
-        console.log({originalPromiseResult});
         if (originalPromiseResult.data) {
           changeFirstName(originalPromiseResult.data.firstName);
           changeLastName(originalPromiseResult.data.lastName);
@@ -65,6 +69,41 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
       })
       .catch(rejectedValueOrSerializedError => {});
   };
+
+  const deleteContactAlert = () =>
+    Alert.alert(
+      'Remove Confirmation',
+      'Are you sure want to remove this contact ?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            dispatch(RemoveContact.action(contactInformation.id))
+              .then(unwrapResult)
+              .then(originalPromiseResult => {
+                Toast.show({
+                  text1: 'Removed',
+                  text2: 'Contact successfully removed',
+                  type: 'success',
+                });
+                changeIsEditable(false);
+              })
+              .catch(rejectedValueOrSerializedError => {
+                Toast.show({
+                  text1: 'Something went wrong',
+                  text2: rejectedValueOrSerializedError.data.message,
+                  type: 'error',
+                });
+              });
+          },
+        },
+      ],
+    );
 
   return (
     <View style={{flex: 1, backgroundColor: 'white', paddingVertical: 16}}>
@@ -132,53 +171,88 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
         />
       </View>
       {isEditable ? (
-        <TouchableOpacity
-          style={{
-            position: 'absolute',
-            width: '80%',
-            alignSelf: 'center',
-            bottom: 16,
-          }}
-          onPress={() => {
-            let payload = {
-              id: contactInformation.id,
-              newData: {
-                firstName: firstName,
-                lastName: lastName,
-                age: age,
-                photo: photo,
-              },
-            };
-            dispatch(UpdateContactData.action(payload))
-              .then(originalPromiseResult => {
-                changeIsEditable(false);
-                Toast.show({
-                  text1: 'Updated',
-                  text2: 'Contact successfully updated',
-                  type: 'success',
-                });
-                getLatestData();
-                setTimeout(() => {
-                  navigateAndSimpleReset('Contact List');
-                }, 500);
-              })
-              .catch(rejectedValueOrSerializedError => {
-                changeIsEditable(false);
-                getLatestData();
-              });
-          }}>
+        updateContactDataIsLoading || removeContactIsLoading ? (
+          <ActivityIndicator
+            size={'large'}
+            color={'teal'}
+            style={{
+              position: 'absolute',
+              alignSelf: 'center',
+              bottom: 16,
+            }}
+          />
+        ) : (
           <View
             style={{
-              width: '100%',
-              height: 50,
-              backgroundColor: '#22409A',
-              borderRadius: 15,
-              alignItems: 'center',
-              justifyContent: 'center',
+              flexDirection: 'row',
+              position: 'absolute',
+              bottom: 16,
+              width: '80%',
+              alignSelf: 'center',
             }}>
-            <Text style={{color: 'white', fontSize: 20}}>Save</Text>
+            <TouchableOpacity
+              style={{
+                width: '80%',
+              }}
+              onPress={() => {
+                let payload = {
+                  id: contactInformation.id,
+                  newData: {
+                    firstName: firstName,
+                    lastName: lastName,
+                    age: age,
+                    photo: photo,
+                  },
+                };
+                dispatch(UpdateContactData.action(payload))
+                  .then(originalPromiseResult => {
+                    changeIsEditable(false);
+                    Toast.show({
+                      text1: 'Updated',
+                      text2: 'Contact successfully updated',
+                      type: 'success',
+                    });
+                    getLatestData();
+                    setTimeout(() => {
+                      navigateAndSimpleReset('Contact List');
+                    }, 500);
+                  })
+                  .catch(rejectedValueOrSerializedError => {
+                    changeIsEditable(false);
+                    getLatestData();
+                  });
+              }}>
+              <View
+                style={{
+                  width: '100%',
+                  height: 50,
+                  backgroundColor: '#22409A',
+                  borderRadius: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Text style={{color: 'white', fontSize: 20}}>Save</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={deleteContactAlert}
+              style={{
+                marginLeft: 16,
+              }}>
+              <View
+                style={{
+                  width: 50,
+                  height: 50,
+                  backgroundColor: '#BF1E2E',
+                  borderRadius: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Icon size={25} color="white" name="delete-forever" />
+              </View>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        )
       ) : (
         <TouchableOpacity
           style={{
