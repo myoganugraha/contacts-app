@@ -9,9 +9,13 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 
 import FetchAllContacts from '@/Store/Contact/FetchAllContacts';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+import { navigate } from '@/Navigators/Root'
 
 const IndexContactListContainer = ({navigation}) => {
   const dispatch = useDispatch();
@@ -23,7 +27,7 @@ const IndexContactListContainer = ({navigation}) => {
   useEffect(() => {
     dispatch(FetchAllContacts.action());
   }, [navigation]);
-
+ 
   function validURL(str) {
     var pattern = new RegExp(
       '^(https?:\\/\\/)?' +
@@ -46,10 +50,16 @@ const IndexContactListContainer = ({navigation}) => {
 
   return (
     <View style={{flex: 1}}>
-      <ScrollView>
-        {contactListIsLoading ? (
-          <ActivityIndicator size={'large'} color={'teal'} />
-        ) : contactList && contactList.data && contactList.data.length > 0 ? (
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={contactListIsLoading}
+            onRefresh={() => {
+              dispatch(FetchAllContacts.action());
+            }}
+          />
+        }>
+        {contactList && !contactListIsLoading && contactList.data && contactList.data.length > 0 ? (
           contactList.data.map((data, i) => {
             return (
               <TouchableOpacity onPress={() => {}} key={i}>
@@ -106,17 +116,25 @@ const IndexContactListContainer = ({navigation}) => {
           <View />
         )}
       </ScrollView>
-      {/* <FlatList
-          data={contactList.data}
-          scrollEnabled={false}
-          style={{ flex: 1 }}
-          renderItem={({item, index}) => {
-            <View style={{ flex: 1, backgroundColor: 'white' }}>
-              <Text>{item.firstName}</Text>
-              <Text>{index}</Text>
-            </View>
+
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          right: 20,
+        }}
+        onPress={() => {navigate('Add Contact')}}>
+        <View
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 30,
+            backgroundColor: '#ee6e73',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
-        /> */}
+        ><Icon size={40} color="white" name="add" /></View>
+      </TouchableOpacity>
     </View>
   );
 };
