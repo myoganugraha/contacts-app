@@ -9,9 +9,14 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 
 import FetchAllContacts from '@/Store/Contact/FetchAllContacts';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+import {navigate} from '@/Navigators/Root';
+import {getInitial, isValidURL} from '@/Function';
 
 const IndexContactListContainer = ({navigation}) => {
   const dispatch = useDispatch();
@@ -24,35 +29,28 @@ const IndexContactListContainer = ({navigation}) => {
     dispatch(FetchAllContacts.action());
   }, [navigation]);
 
-  function validURL(str) {
-    var pattern = new RegExp(
-      '^(https?:\\/\\/)?' +
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
-        '((\\d{1,3}\\.){3}\\d{1,3}))' +
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
-        '(\\?[;&a-z\\d%_.~+=-]*)?' +
-        '(\\#[-a-z\\d_]*)?$',
-      'i',
-    );
-    return !!pattern.test(str);
-  }
-
-  function getInitial(name) {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('');
-  }
-
   return (
     <View style={{flex: 1}}>
-      <ScrollView>
-        {contactListIsLoading ? (
-          <ActivityIndicator size={'large'} color={'teal'} />
-        ) : contactList && contactList.data && contactList.data.length > 0 ? (
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={contactListIsLoading}
+            onRefresh={() => {
+              dispatch(FetchAllContacts.action());
+            }}
+          />
+        }>
+        {contactList &&
+        !contactListIsLoading &&
+        contactList.data &&
+        contactList.data.length > 0 ? (
           contactList.data.map((data, i) => {
             return (
-              <TouchableOpacity onPress={() => {}} key={i}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigate('Contact Details', {contactInformation: data});
+                }}
+                key={i}>
                 <View
                   style={{
                     backgroundColor: 'white',
@@ -64,7 +62,7 @@ const IndexContactListContainer = ({navigation}) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                   }}>
-                  {validURL(data.photo) ? (
+                  {isValidURL(data.photo) ? (
                     <Image
                       style={{
                         width: 40,
@@ -87,16 +85,17 @@ const IndexContactListContainer = ({navigation}) => {
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}>
-                      <Text>
+                      <Text style={{color: 'black'}}>
                         {getInitial(data.firstName + ' ' + data.lastName)}
                       </Text>
                     </View>
                   )}
                   <View>
-                    <Text style={{fontWeight: '600', fontSize: 18}}>
+                    <Text
+                      style={{fontWeight: '600', fontSize: 18, color: 'black'}}>
                       {data.firstName + ' ' + data.lastName}
                     </Text>
-                    <Text style={{}}>{'Age : ' + data.age}</Text>
+                    <Text style={{color: 'black'}}>{'Age : ' + data.age}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -106,17 +105,28 @@ const IndexContactListContainer = ({navigation}) => {
           <View />
         )}
       </ScrollView>
-      {/* <FlatList
-          data={contactList.data}
-          scrollEnabled={false}
-          style={{ flex: 1 }}
-          renderItem={({item, index}) => {
-            <View style={{ flex: 1, backgroundColor: 'white' }}>
-              <Text>{item.firstName}</Text>
-              <Text>{index}</Text>
-            </View>
-          }}
-        /> */}
+
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          right: 20,
+        }}
+        onPress={() => {
+          navigate('Add Contact');
+        }}>
+        <View
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 30,
+            backgroundColor: '#ee6e73',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Icon size={40} color="white" name="add" />
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };

@@ -1,9 +1,27 @@
-import { buildSlice } from '@thecodingmachine/redux-toolkit-wrapper'
-import FetchAllContacts from './FetchAllContacts'
+import {buildSlice} from '@thecodingmachine/redux-toolkit-wrapper';
+import FetchAllContacts from './FetchAllContacts';
+import AddContact from './AddContact';
+import FetchContactDetails from './FetchContactDetails';
+import ResetContactDetails from './ResetContactDetails';
+import UpdateContactData from './UpdateContactData';
+import RemoveContact from './RemoveContact';
 
-// This state is common to all the "user" module, and can be modified by any "user" reducers
 const sliceInitialState = {
   item: [],
-}
+  addContact: null,
+  contactDetails: null,
+  updateContactData: null,
+};
 
-export default buildSlice('contact', [FetchAllContacts], sliceInitialState).reducer
+export default buildSlice(
+  'contact',
+  [
+    AddContact,
+    FetchAllContacts,
+    FetchContactDetails,
+    ResetContactDetails,
+    UpdateContactData,
+    RemoveContact,
+  ],
+  sliceInitialState,
+).reducer;
