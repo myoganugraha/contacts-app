@@ -101,7 +101,7 @@ const IndexAddContactContainer = ({navigation}) => {
             bottom: 16,
           }}
           onPress={() => {
-            var data = {
+            let data = {
               firstName: firstName,
               lastName: lastName,
               age: age,

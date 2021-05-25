@@ -16,8 +16,11 @@ import {
 
 import FetchContactDetails from '@/Store/Contact/FetchContactDetails';
 import ResetContactDetails from '@/Store/Contact/ResetContactDetails';
+import UpdateContactData from '@/Store/Contact/UpdateContactData';
 import {getInitial, isValidURL} from '@/Function';
 import {unwrapResult} from '@reduxjs/toolkit';
+
+import {navigateAndSimpleReset} from '@/Navigators/Root';
 
 import Toast from 'react-native-toast-message';
 
@@ -34,38 +37,34 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
   const contactDetailsIsLoading = useSelector(
     state => state.contact.fetchContactDetails.loading,
   );
+  const updateContactDataIsLoading = useSelector(
+    state => state.contact.updateContactData.loading,
+  );
+
   useEffect(() => {
     dispatch(ResetContactDetails.action());
   }, [navigation]);
 
   useEffect(() => {
     if (contactDetails == null) {
-      dispatch(FetchContactDetails.action(contactInformation.id))
-        .then(unwrapResult)
-        .then(originalPromiseResult => {
-          console.log({originalPromiseResult});
-          if (originalPromiseResult.data) {
-            changeFirstName(originalPromiseResult.data.firstName);
-            changeLastName(originalPromiseResult.data.lastName);
-            changeAge(originalPromiseResult.data.age.toString());
-            changePhoto(originalPromiseResult.data.photo);
-
-            Toast.show({
-              text1: 'Success',
-              text2: 'Using latest data from the selected contact',
-              type: 'success',
-            });
-          }
-        })
-        .catch(rejectedValueOrSerializedError => {
-          Toast.show({
-            text1: 'Failed',
-            text2: 'Failed to fetch latest data',
-            type: 'error',
-          });
-        });
+      getLatestData();
     }
   }, [contactDetails]);
+
+  getLatestData = () => {
+    dispatch(FetchContactDetails.action(contactInformation.id))
+      .then(unwrapResult)
+      .then(originalPromiseResult => {
+        console.log({originalPromiseResult});
+        if (originalPromiseResult.data) {
+          changeFirstName(originalPromiseResult.data.firstName);
+          changeLastName(originalPromiseResult.data.lastName);
+          changeAge(originalPromiseResult.data.age.toString());
+          changePhoto(originalPromiseResult.data.photo);
+        }
+      })
+      .catch(rejectedValueOrSerializedError => {});
+  };
 
   return (
     <View style={{flex: 1, backgroundColor: 'white', paddingVertical: 16}}>
@@ -140,7 +139,36 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
             alignSelf: 'center',
             bottom: 16,
           }}
-          onPress={() => {}}>
+          onPress={() => {
+            let payload = {
+              id: contactInformation.id,
+              newData: {
+                firstName: firstName,
+                lastName: lastName,
+                age: age,
+                photo: photo,
+              },
+            };
+            dispatch(UpdateContactData.action(payload))
+              .then(originalPromiseResult => {
+                console.log({originalPromiseResult});
+                changeIsEditable(false);
+                Toast.show({
+                  text1: 'Updated',
+                  text2: 'Contact successfully updated',
+                  type: 'success',
+                });
+                getLatestData();
+                setTimeout(() => {
+                  navigateAndSimpleReset('Contact List');
+                }, 500);
+              })
+              .catch(rejectedValueOrSerializedError => {
+                console.log({rejectedValueOrSerializedError});
+                changeIsEditable(false);
+                getLatestData();
+              });
+          }}>
           <View
             style={{
               width: '100%',
@@ -161,12 +189,14 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
             alignSelf: 'center',
             bottom: 16,
           }}
-          onPress={() => {}}>
+          onPress={() => {
+            changeIsEditable(true);
+          }}>
           <View
             style={{
               width: '100%',
               height: 50,
-              backgroundColor: '#BF1E2E',
+              backgroundColor: '#F47820',
               borderRadius: 15,
               alignItems: 'center',
               justifyContent: 'center',
