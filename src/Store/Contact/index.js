@@ -4,6 +4,7 @@ import AddContact from './AddContact';
 import FetchContactDetails from './FetchContactDetails';
 import ResetContactDetails from './ResetContactDetails';
 import UpdateContactData from './UpdateContactData';
+import RemoveContact from './RemoveContact';
 
 const sliceInitialState = {
   item: [],
@@ -20,6 +21,7 @@ export default buildSlice(
     FetchContactDetails,
     ResetContactDetails,
     UpdateContactData,
+    RemoveContact,
   ],
   sliceInitialState,
 ).reducer;

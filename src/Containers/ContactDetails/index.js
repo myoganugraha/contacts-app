@@ -16,6 +16,7 @@ import {
 
 import FetchContactDetails from '@/Store/Contact/FetchContactDetails';
 import ResetContactDetails from '@/Store/Contact/ResetContactDetails';
+import RemoveContact from '@/Store/Contact/RemoveContact';
 import UpdateContactData from '@/Store/Contact/UpdateContactData';
 import {getInitial, isValidURL} from '@/Function';
 import {unwrapResult} from '@reduxjs/toolkit';
@@ -41,6 +42,9 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
   const updateContactDataIsLoading = useSelector(
     state => state.contact.updateContactData.loading,
   );
+  const removeContactIsLoading = useSelector(
+    state => state.contact.removeContact.loading,
+  );
 
   useEffect(() => {
     dispatch(ResetContactDetails.action());
@@ -52,11 +56,10 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
     }
   }, [contactDetails]);
 
-  getLatestData = () => {
+  const getLatestData = () => {
     dispatch(FetchContactDetails.action(contactInformation.id))
       .then(unwrapResult)
       .then(originalPromiseResult => {
-        console.log({originalPromiseResult});
         if (originalPromiseResult.data) {
           changeFirstName(originalPromiseResult.data.firstName);
           changeLastName(originalPromiseResult.data.lastName);
@@ -68,14 +71,41 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
   };
 
   const deleteContactAlert = () =>
-    Alert.alert('Alert Title', 'My Alert Msg', [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-      {text: 'OK', onPress: () => console.log('OK Pressed')},
-    ]);
+    Alert.alert(
+      'Remove Confirmation',
+      'Are you sure want to remove this contact ?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log(contactInformation.id)
+            dispatch(RemoveContact.action(contactInformation.id))
+              .then(unwrapResult)
+              .then(originalPromiseResult => {
+                Toast.show({
+                  text1: 'Removed',
+                  text2: 'Contact successfully removed',
+                  type: 'success',
+                });
+                changeIsEditable(false);
+              })
+              .catch(rejectedValueOrSerializedError => {
+                console.log({ rejectedValueOrSerializedError })
+                Toast.show({
+                  text1: 'Something went wrong',
+                  text2: rejectedValueOrSerializedError.data.message,
+                  type: 'error',
+                });
+              });
+          },
+        },
+      ],
+    );
 
   return (
     <View style={{flex: 1, backgroundColor: 'white', paddingVertical: 16}}>
@@ -143,7 +173,7 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
         />
       </View>
       {isEditable ? (
-        updateContactDataIsLoading ? (
+        updateContactDataIsLoading || removeContactIsLoading ? (
           <ActivityIndicator
             size={'large'}
             color={'teal'}
