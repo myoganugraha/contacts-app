@@ -151,7 +151,6 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
             };
             dispatch(UpdateContactData.action(payload))
               .then(originalPromiseResult => {
-                console.log({originalPromiseResult});
                 changeIsEditable(false);
                 Toast.show({
                   text1: 'Updated',
@@ -164,7 +163,6 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
                 }, 500);
               })
               .catch(rejectedValueOrSerializedError => {
-                console.log({rejectedValueOrSerializedError});
                 changeIsEditable(false);
                 getLatestData();
               });
