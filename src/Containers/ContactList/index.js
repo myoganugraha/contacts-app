@@ -13,6 +13,9 @@ import {
 } from 'react-native';
 
 import FetchAllContacts from '@/Store/Contact/FetchAllContacts';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+import { navigate } from '@/Navigators/Root'
 
 const IndexContactListContainer = ({navigation}) => {
   const dispatch = useDispatch();
@@ -25,10 +28,6 @@ const IndexContactListContainer = ({navigation}) => {
     dispatch(FetchAllContacts.action());
   }, [navigation]);
  
-  useEffect(() => {
-    console.log(contactList.data.length)
-  }, [contactList]);
-
   function validURL(str) {
     var pattern = new RegExp(
       '^(https?:\\/\\/)?' +
@@ -124,15 +123,17 @@ const IndexContactListContainer = ({navigation}) => {
           bottom: 20,
           right: 20,
         }}
-        onPress={() => {}}>
+        onPress={() => {navigate('Add Contact')}}>
         <View
           style={{
             width: 60,
             height: 60,
             borderRadius: 30,
             backgroundColor: '#ee6e73',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
-        />
+        ><Icon size={40} color="white" name="add" /></View>
       </TouchableOpacity>
     </View>
   );
