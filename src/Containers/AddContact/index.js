@@ -19,6 +19,7 @@ import AddContact from '@/Store/Contact/AddContact';
 
 import {navigateAndSimpleReset} from '@/Navigators/Root';
 import {unwrapResult} from '@reduxjs/toolkit';
+
 import Toast from 'react-native-toast-message';
 
 const IndexAddContactContainer = ({navigation}) => {
@@ -157,7 +158,6 @@ const IndexAddContactContainer = ({navigation}) => {
           </View>
         </TouchableOpacity>
       )}
-      <Toast ref={ref => Toast.setRef(ref)} />
     </View>
   );
 };

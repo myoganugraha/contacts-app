@@ -16,6 +16,7 @@ import FetchAllContacts from '@/Store/Contact/FetchAllContacts';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { navigate } from '@/Navigators/Root'
+import { getInitial, isValidURL } from '@/Function'
 
 const IndexContactListContainer = ({navigation}) => {
   const dispatch = useDispatch();
@@ -27,26 +28,6 @@ const IndexContactListContainer = ({navigation}) => {
   useEffect(() => {
     dispatch(FetchAllContacts.action());
   }, [navigation]);
- 
-  function validURL(str) {
-    var pattern = new RegExp(
-      '^(https?:\\/\\/)?' +
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
-        '((\\d{1,3}\\.){3}\\d{1,3}))' +
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
-        '(\\?[;&a-z\\d%_.~+=-]*)?' +
-        '(\\#[-a-z\\d_]*)?$',
-      'i',
-    );
-    return !!pattern.test(str);
-  }
-
-  function getInitial(name) {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('');
-  }
 
   return (
     <View style={{flex: 1}}>
@@ -62,7 +43,9 @@ const IndexContactListContainer = ({navigation}) => {
         {contactList && !contactListIsLoading && contactList.data && contactList.data.length > 0 ? (
           contactList.data.map((data, i) => {
             return (
-              <TouchableOpacity onPress={() => {}} key={i}>
+              <TouchableOpacity onPress={() => {
+                navigate('Contact Details', {contactInformation: data})
+              }} key={i}>
                 <View
                   style={{
                     backgroundColor: 'white',
@@ -74,7 +57,7 @@ const IndexContactListContainer = ({navigation}) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                   }}>
-                  {validURL(data.photo) ? (
+                  {isValidURL(data.photo) ? (
                     <Image
                       style={{
                         width: 40,
