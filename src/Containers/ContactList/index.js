@@ -29,6 +29,7 @@ const IndexContactListContainer = ({navigation}) => {
     dispatch(FetchAllContacts.action());
   }, [navigation]);
 
+
   return (
     <View style={{flex: 1}}>
       <ScrollView
