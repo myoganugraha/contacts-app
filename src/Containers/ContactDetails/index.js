@@ -67,6 +67,16 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
       .catch(rejectedValueOrSerializedError => {});
   };
 
+  const deleteContactAlert = () =>
+    Alert.alert('Alert Title', 'My Alert Msg', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'OK', onPress: () => console.log('OK Pressed')},
+    ]);
+
   return (
     <View style={{flex: 1, backgroundColor: 'white', paddingVertical: 16}}>
       <View style={{alignItems: 'center', marginBottom: 32}}>
@@ -197,8 +207,9 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
               </View>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={deleteContactAlert}
               style={{
-                marginLeft: 8,
+                marginLeft: 16,
               }}>
               <View
                 style={{
@@ -208,8 +219,9 @@ const IndexContactDetailsContainer = ({route, navigation}) => {
                   borderRadius: 15,
                   alignItems: 'center',
                   justifyContent: 'center',
-                }}
-              ><Icon size={25} color="white" name="delete-forever" /></View>
+                }}>
+                <Icon size={25} color="white" name="delete-forever" />
+              </View>
             </TouchableOpacity>
           </View>
         )
